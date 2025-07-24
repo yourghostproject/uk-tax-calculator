@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Free UK Tax Calculator for PAYE and Self-Employed Income 2025. No sign-up, instant estimate of your tax and NI payments."/>
+  <title>UK Tax & NI Estimator 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      background: #f8f8f8;
+      color: #333;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0058c2;
+    }
+    .output {
+      background: white;
+      padding: 1rem;
+      border-radius: 5px;
+      margin-top: 1rem;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>UK Tax & NI Estimator 2025</h1>
+  <p>No sign-up. Instant tax & national insurance breakdown for PAYE and self-employed income.</p>
+
+  <label>Annual PAYE Salary (£):</label>
+  <input type="number" id="paye" placeholder="e.g. 28000">
+
+  <label>Self-Employed Income (£):</label>
+  <input type="number" id="selfIncome" placeholder="e.g. 15000">
+
+  <label>Self-Employed Expenses (£):</label>
+  <input type="number" id="expenses" placeholder="e.g. 3000">
+
+  <button onclick="calculateTax()">Calculate</button>
+
+  <div class="output" id="result" style="display:none;"></div>
+
+  <script>
+    function calculateTax() {
+      const paye = parseFloat(document.getElementById('paye').value) || 0;
+      const selfIncome = parseFloat(document.getElementById('selfIncome').value) || 0;
+      const expenses = parseFloat(document.getElementById('expenses').value) || 0;
+
+      const selfProfit = selfIncome - expenses;
+      const totalIncome = paye + selfProfit;
+
+      // Income Tax
+      let tax = 0;
+      const taxFree = 12570;
+      const basicRate = 0.20;
+      const higherRate = 0.40;
+
+      if (totalIncome > taxFree) {
+        const taxable = totalIncome - taxFree;
+        if (taxable <= 37700) {
+          tax = taxable * basicRate;
+        } else {
+          tax = 37700 * basicRate + (taxable - 37700) * higherRate;
+        }
+      }
+
+      // Class 2 NI
+      let class2 = selfProfit > 6725 ? 179.40 : 0; // Fixed per year
+
+      // Class 4 NI
+      let class4 = 0;
+      if (selfProfit > 12570) {
+        const lower = 50270;
+        const lowerRate = 0.09;
+        const upperRate = 0.02;
+
+        if (selfProfit <= lower) {
+          class4 = (selfProfit - 12570) * lowerRate;
+        } else {
+          class4 = (lower - 12570) * lowerRate + (selfProfit - lower) * upperRate;
+        }
+      }
+
+      const niTotal = class2 + class4;
+      const totalTax = tax + niTotal;
+      const takeHome = totalIncome - totalTax;
+
+      document.getElementById('result').style.display = 'block';
+      document.getElementById('result').innerHTML = `
+        <strong>Total Income:</strong> £${totalIncome.toFixed(2)}<br>
+        <strong>Estimated Income Tax:</strong> £${tax.toFixed(2)}<br>
+        <strong>National Insurance (Class 2 + 4):</strong> £${niTotal.toFixed(2)}<br>
+        <strong>Total Tax & NI:</strong> £${totalTax.toFixed(2)}<br>
+        <strong>Estimated Take-Home Pay:</strong> £${takeHome.toFixed(2)}
+      `;
+    }
+  </script>
+</body>
+</html>
