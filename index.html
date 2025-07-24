@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Free UK Tax Calculator for PAYE and Self-Employed Income 2025. No sign-up, instant estimate of your tax and NI payments."/>
-  <title>UK Tax & NI Estimator 2025</title>
+  <meta name="description" content="Free UK tax calculator for PAYE & self-employed income. Instantly estimates income tax, Class 2 & Class 4 NI and monthly take-home. No sign-up."/>
+  <title>UK Self-Employed + PAYE Tax Calculator 2025</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,6 +16,12 @@
     }
     h1 {
       font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    .brand {
+      font-weight: bold;
+      color: #0070f3;
+      font-size: 1rem;
       margin-bottom: 1rem;
     }
     input, button {
@@ -42,11 +48,25 @@
       margin-top: 1rem;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
+    .note {
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    .note a {
+      color: #0070f3;
+      text-decoration: none;
+    }
+    .note a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <h1>UK Tax & NI Estimator 2025</h1>
-  <p>No sign-up. Instant tax & national insurance breakdown for PAYE and self-employed income.</p>
+  <div class="brand">by UKTaxTool</div>
+  <p>No sign-up. Instant income tax & NI breakdown for PAYE and self-employed income.</p>
 
   <label>Annual PAYE Salary (£):</label>
   <input type="number" id="paye" placeholder="e.g. 28000">
@@ -62,6 +82,10 @@
   <div class="output" id="result" style="display:none;"></div>
 
   <script>
+    function formatMoney(amount) {
+      return amount.toLocaleString('en-UK', { style: 'currency', currency: 'GBP', minimumFractionDigits: 0 });
+    }
+
     function calculateTax() {
       const paye = parseFloat(document.getElementById('paye').value) || 0;
       const selfIncome = parseFloat(document.getElementById('selfIncome').value) || 0;
@@ -86,7 +110,7 @@
       }
 
       // Class 2 NI
-      let class2 = selfProfit > 6725 ? 179.40 : 0; // Fixed per year
+      let class2 = selfProfit > 6725 ? 179.40 : 0;
 
       // Class 4 NI
       let class4 = 0;
@@ -105,16 +129,26 @@
       const niTotal = class2 + class4;
       const totalTax = tax + niTotal;
       const takeHome = totalIncome - totalTax;
+      const monthly = takeHome / 12;
 
       document.getElementById('result').style.display = 'block';
       document.getElementById('result').innerHTML = `
-        <strong>Total Income:</strong> £${totalIncome.toFixed(2)}<br>
-        <strong>Estimated Income Tax:</strong> £${tax.toFixed(2)}<br>
-        <strong>National Insurance (Class 2 + 4):</strong> £${niTotal.toFixed(2)}<br>
-        <strong>Total Tax & NI:</strong> £${totalTax.toFixed(2)}<br>
-        <strong>Estimated Take-Home Pay:</strong> £${takeHome.toFixed(2)}
+        <strong>Total Income:</strong> ${formatMoney(totalIncome)}<br>
+        <strong>Estimated Income Tax:</strong> ${formatMoney(tax)}<br>
+        <strong>National Insurance (Class 2 + 4):</strong> ${formatMoney(niTotal)}<br>
+        <strong>Total Tax & NI:</strong> ${formatMoney(totalTax)}<br>
+        <strong>Estimated Take-Home Pay:</strong> ${formatMoney(takeHome)}<br>
+        <strong>Estimated Monthly Income:</strong> ${formatMoney(monthly)}
       `;
     }
   </script>
+
+  <div class="note">
+    ⚠️ This tool provides a simplified estimate of UK tax and NI based on 2025 thresholds.<br>
+    It does not include student loans, pensions, or Scottish bands.<br>
+    Sources: 
+    <a href="https://www.gov.uk/income-tax-rates" target="_blank">HMRC Income Tax</a>, 
+    <a href="https://www.gov.uk/self-employed-national-insurance-rates" target="_blank">HMRC National Insurance</a>.
+  </div>
 </body>
 </html>
